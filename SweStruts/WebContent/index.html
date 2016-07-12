@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+ <title>Survey Form - Amulya Reddy</title>
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+ <link rel="stylesheet" href="assets/jquery-ui-1.10.4/themes/base/jquery.ui.all.css">
+ <script type="text/javascript" src="assets/jquery-1.11.0.min.js"></script> 
+ <script src="assets/jquery-ui-1.10.4/jquery-1.10.2.js"></script>
+ <script src="assets/jquery-ui-1.10.4/ui/jquery.ui.core.js"></script>
+ <script src="assets/jquery-ui-1.10.4/ui/jquery.ui.widget.js"></script>
+ <script src="assets/jquery-ui-1.10.4/ui/jquery.ui.position.js"></script>
+ <script src="assets/jquery-ui-1.10.4/ui/jquery.ui.tooltip.js"></script>
+ <script src="assets/jquery-ui-1.10.4/ui/jquery-ui.js"></script>
+ <link rel="stylesheet" href="style.css"/>
+ <script type="text/javascript">
+	//Zip validation
+	function getRequestObject() {
+		if(window.XMLHttpRequest)
+			return (new XMLHttpRequest());
+		else if (window.ActiveXObject)
+			return (new ActiveXObject("Microsoft.XMLHTTP"));
+		else
+			return (null);
+	}
+	
+	function ajaxResult(zip) {
+		var request = getRequestObject();
+		request.onreadystatechange = function() {
+			showResponseText(request,zip); 
+		}
+		request.open("GET", "zips.json", true);
+		request.send(null);
+	}
+
+	function showResponseText(request,zip) {
+		if ((request.readyState == 4) && (request.status == 200)) {
+			var i = extractInfo(request.responseText,zip);
+				if(i[0]) {
+					document.getElementById("city").value = i[1];
+					document.getElementById("state").value = i[2];
+					document.getElementById("zip_error_field").innerHTML = "";
+				}
+				else {
+					document.getElementById("zip_error_field").innerHTML = "Error,invalid zip.";
+					document.getElementById("city").value = "";
+					document.getElementById("state").value = "";
+				}
+		}
+	}
+	
+	function extractInfo(response,desiredZip) {
+		var obj = JSON.parse(response);
+	    var size = obj.zipcodes.length;
+		var result = new Array;
+	  	result[0] = false; 
+		result[1] = "null";
+		result[2] = "null";
+		console.log("JSON Size: " + size);
+		for (var x = 0; x < size; x++) {
+			var zc = obj.zipcodes[x];
+			if(zc.zip == desiredZip) {
+				result[0] = true; 
+				result[1] = zc.city;
+				result[2] = zc.state;
+				//console.log("Found Index: " + x + "  , City: " + tp.city + " , State: " + tp.state);
+			}
+		}
+		return result;
+	}
+	
+	function validateZip() {
+		var zip = document.getElementById("zip").value;
+		var pattern = /^\d{5}$/;
+		if(pattern.test(zip)){
+			console.log("The zip code Pulled: " + zip);
+			ajaxResult(zip);
+		} else{
+			document.getElementById("zip_error_field").innerHTML = "Error,invalid zip.";
+			document.getElementById("city").value = "";
+			document.getElementById("state").value = "";
+		}
+	}
+	
+	//Data Validation
+	function validateData() 
+	{
+		var Patt = /^[0-9\s]*$/;
+		var num= document.getElementById("data").value;
+        var t_num = num.replace(/^[, ]+|[, ]+$|[, ]+/g, " ").trim();
+		var nums = t_num.split(" ");
+		if(nums.length >= 10)
+		{
+			for (var i = 0; i < nums.length; i++) 
+			{
+				if(parseFloat(nums[i]) < 1 || parseFloat(nums[i]) > 100)
+				{
+					document.getElementById("data_error_field").innerHTML = "Please enter numbers within the range 1 through 100.";
+					return false;
+				}
+				
+				if (!(Patt.test(parseFloat(nums[i]))))
+				{
+					document.getElementById("data_error_field").innerHTML = "Please enter only numbers.";
+					return false;
+				}
+			}
+		}
+		else
+		{
+			document.getElementById("data_error_field").innerHTML = "Enter atleast 10 numbers.";
+			return false;
+		}
+		document.getElementById("data_error_field").innerHTML = "";
+	}
+ </script> 
+ <script type="text/javascript">
+   function validation()
+	{
+		var msg = new Array();
+		var flag = false;
+		
+		//f1-student id
+		if(document.survey.sid.value == "")
+			msg[msg.length] = "Student ID cannot be blank.";
+		
+		//f2-first name
+        var namePatt = /^[a-zA-Z\s]*$/;
+		if(document.survey.fname.value == "")	
+			msg[msg.length] = "First name cannot be blank.";
+		if (!(namePatt.test(document.getElementById("fname").value)))
+			msg[msg.length] = "First name can only have alphabets.";
+		
+		//f3-last name
+		if (!(namePatt.test(document.getElementById("lname").value)))
+			msg[msg.length] = "Last name can only have alphabets.";
+		
+		//f4-zip code
+		if(document.survey.zip.value == "")
+			msg[msg.length] = "Zip code cannot be blank.";
+		if(document.survey.zip.length < 5)
+			msg[msg.length] = "Zip code cannot be less than 5 digits.";
+		//f5-street address
+        var addrPatt = /^[a-zA-Z0-9\s]*$/;
+		if(document.survey.addr.value == "")
+			msg[msg.length] = "Street address cannot be blank.";
+		if (!(addrPatt.test(document.getElementById("addr").value)))
+			msg[msg.length] = "Street address can only have alphabet or numeric values.";
+		
+		//f6-telephone number
+		var telPatt = /^[0-9\s]*$/;
+		if (!(telPatt.test(document.getElementById("telno").value)))
+			msg[msg.length] = "Telephone# can only have numeric values.";
+		
+		//f7-email id
+		var emailPatt = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/; 
+		if(document.survey.email.value == "")	
+			msg[msg.length] = "Email cannot be blank.";
+		if (!(emailPatt.test(document.getElementById("email").value)))
+			msg[msg.length] = "Enter a proper email.";
+		
+		//checkbox
+		if (checkBox(document.survey) == false)
+			msg[msg.length] = "Select atleast two things that you liked about the campus."; 
+		
+		//radio button
+        if (checkRadio(document.survey) == false)
+			msg[msg.length] = "Select at least one reason for what got you interested in our university.";
+
+		if (msg.length > 0){
+			var errMsg = "";
+    		for (var i=0; i<msg.length; i++) {
+    			errMsg += "<font size='2'>" + msg[i] + "<br>";
+    		}
+    		errMsg += "</font>";
+    		document.getElementById("errBox").innerHTML = errMsg;
+		}
+		else {
+			document.getElementById("errBox").innerHTML = "";
+			flag = true;
+		}
+	
+		if (!flag) {
+		$( "#modal" ).dialog({
+			height:350, 
+			width:600,
+			modal:true
+		});
+		}
+	 
+		return flag;
+	}
+   
+    function checkBox(cb) {
+		var cb_values = document.getElementsByName("cb");
+		var count = 0;
+		for (var x=0; x<cb_values.length; x++) {
+			if (cb_values[x].checked)
+				count++;
+		}
+		if (count < 2)
+			return false;
+	}
+   
+	function checkRadio(rad)
+	{
+		var re = false;
+		var interest = rad.radio;
+		for(var i=0; i<interest.length; i++) 
+		{		
+			if(interest[i].checked == true) 
+			{
+				re = true;
+				break;
+			}
+		}
+		return re;
+	}
+ </script>
+</head>
+<body>
+ <div id="modal" title="Warning"><div id="errBox"></div></div>
+ <div id="header_bar"><div id="heading">Department of Computer Science</div></div>	
+ <div id="content">
+  <fieldset>
+ 	<h1 align="center">Survey Form</h1>
+ 	  <form name="survey" autocomplete="on" method="post" action="MainAxn">
+ 		<table  border="1" width=70% align="center" class='thick'>
+		  <tr>
+		  	<td>Student ID*:</br><input type="text" name="sid" id="sid" autofocus /></td>
+		  	<td>First name*:</br><input type="text" name="fname" id ="fname" /></td>
+		  	<td>Last name:</br><input type="text" name="lname" id="lname" /></td>
+		  </tr>
+		  <tr>
+			<td>Zip*:<br/>
+			  <input type="text" id="zip" name="zip" value="" placeholder="22030" onblur="validateZip();" /><br/>
+			  <span style="margin-left: 20px; color: red; font-size: 10pt" id="zip_error_field"></span></td>
+			<td>City:</br><textarea name="city" rows="1" cols="50" style="width:200px" id="city"></textarea></td>
+			<td>State:</br><textarea name="state" rows="1" cols="50" style="width:200px" id="state"></textarea></td>
+	      </tr>
+		  <tr>
+			<td>Street address*:</br><input type="text" cols="30" rows="2" name="addr" id="addr" /></td>
+			<td>Telephone #:</br><input type="text" name="telno" id="telno" /></td>
+			<td>Email ID*:</br><input type="text" cols="30" rows="2" name="email" id="email" placeholder="abc@xyz.com" /></td>
+		  </tr>
+		  <tr>
+			<td><p>Please select what you like most about the campus*:</br>
+			  <input type="checkbox" name="cb" id="cb1" value="Students" />Students<br>
+			  <input type="checkbox" name="cb" id="cb2" value="Location" />Location<br>
+			  <input type="checkbox" name="cb" id="cb3" value="Campus" /> Campus<br>
+			  <input type="checkbox" name="cb" id="cb4" value="Atmosphere" />Atmosphere<br>
+			  <input type="checkbox" name="cb" id="cb5" value="Dormrooms" />Dorm Rooms<br>
+			  <input type="checkbox" name="cb" id="cb6"  value="Sports" />Sports</p></td>
+			<td><p>What about the university interested you*:</br>
+ 			  <input type="radio" name="radio" id="radio" value="Friends" /> Friends<br>
+ 			  <input type="radio" name="radio" id="radio" value="Television" /> Television<br>
+ 			  <input type="radio" name="radio" id="radio" value="Internet" /> Internet<br>
+  			  <input type="radio" name="radio" id="radio" value="Other" /> Other</p></td>
+			<td><p>Your likelihood to recommend this school:</br>
+			  <select name="reco" id="reco">
+				<option value="Very likely">Very likely</option>
+				<option value="Likely">Likely</option>
+				<option value="Unlikely">Unlikely</option>
+  			  </select></p></td>
+		  </tr>
+		  <tr>
+			<td><p>High school graduation month:</br>
+			  <input list="month" name="month" />
+				<datalist id="month">
+    			  <option value="January">
+    			  <option value="February">
+    			  <option value="March">
+    			  <option value="April">
+    			  <option value="May">
+				  <option value="June">
+				  <option value="July">
+				  <option value="August">
+				  <option value="Septmber">
+				  <option value="October">
+				  <option value="November">
+				  <option value="December">
+				</datalist></p></td>
+			<td> Graduation year:</br><input type="text" size="25" id="year" name="year" placeholder="2016" /></td>
+			<td> Additional comments:</br><textarea name="adCmt" rows="7" cols="100" style="width:400px" id="adCmt"></textarea></td>
+		  </tr>
+		  <tr>
+			<td>Your homepage url:</br><input type="url" name="url" id="url" value="" placeholder="http://xyz.com" /></td>
+			<td>Data:</br>
+			  <font size="2" color="grey">Please enter atleast 10 comma separated numbers within the range 1 through 100.</font><br/><input type="text" id="data" name="data" onblur = "validateData()" style="width:400px" /><br />
+		      <span style="margin-left: 20px; color: red; font-size: 10pt" id="data_error_field"></span></td>
+			<td>Date of survey*:</br><input type="date" name="dos" id="dos" placeholder="mm/dd/yyyy" /></td>
+		  </tr>
+		</table>  
+	  <p align="center">
+		<input type="submit" value="Submit Form" onclick = "return validation()"/>
+		<input type = "reset" value = "Clear Form">
+	  </p>
+	  </form>
+  </fieldset>
+ </div>
+ <div id="footer">
+	Created By: <b>Amulya Reddy</b>
+	<a href="http://www.gmu.edu/" title="Please visit http://www.gmu.edu for more information. (Click on the logo to visit the site)"><img id="gmuLogo" align="right" width="200px" src="GMU_LOGO.jpg"/></a>
+ </div>
+</body>
+</html>

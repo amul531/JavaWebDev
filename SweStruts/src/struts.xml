@@ -1,0 +1,19 @@
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<package name="default" namespace="/" extends="struts-default">
+		
+	<action name="MainAxn" class="controller.StAxn">
+		<result name="simple">SimpleAcknowledgement.jsp</result>
+		<result name="winner">WinnerAcknowledgement.jsp</result>
+	</action>
+	
+	<action name="NextAxn" class="controller.StAxn" method="doGetDets">
+		<result name="success">Student.jsp</result>
+		<result name="error">NoSuchStudent.jsp</result>
+	</action>
+		
+	</package>
+</struts>
